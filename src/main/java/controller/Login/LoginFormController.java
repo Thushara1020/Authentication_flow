@@ -34,12 +34,12 @@ public class LoginFormController {
             return;
         }
 
-        // 🔹 Get first name from DB
+
         String firstName = authenticateUserAndGetName(email, password);
 
         if (firstName != null) {
 
-            // ✅ store logged user first name (STATIC)
+
             WelcomeFormController.loggedUserFirstName = firstName;
 
             navigateToDashboard();
@@ -50,7 +50,7 @@ public class LoginFormController {
         }
     }
 
-    // 🔹 Authenticate + return first_name
+
     private String authenticateUserAndGetName(String email, String password) {
 
         String url = "jdbc:mysql://localhost:3306/user_management?useSSL=false&serverTimezone=UTC";

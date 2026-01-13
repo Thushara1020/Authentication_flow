@@ -15,7 +15,7 @@ import java.util.ResourceBundle;
 
 public class WelcomeFormController implements Initializable {
 
-    // 🔹 This will hold logged user first name
+
     public static String loggedUserFirstName;
 
     @FXML
@@ -24,7 +24,7 @@ public class WelcomeFormController implements Initializable {
     @FXML
     private Label txtFirstName;
 
-    // 🔹 Automatically called when FXML loads
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         if (loggedUserFirstName != null) {

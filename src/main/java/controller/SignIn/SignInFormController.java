@@ -28,7 +28,6 @@ public class SignInFormController {
 
     @FXML
     void registerOnAction(ActionEvent event) {
-
         String firstName = txtFirstName.getText().trim();
         String lastName = txtLastName.getText().trim();
         String email = txtEmail.getText().trim();
@@ -36,62 +35,75 @@ public class SignInFormController {
         String confirmPassword = txtConfirmPassword.getText();
 
         if (firstName.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
-            new Alert(Alert.AlertType.ERROR, "Please fill in all required fields!").show();
+            showAlert(Alert.AlertType.ERROR, "Validation Error", "Please fill in all required fields!");
             return;
         }
 
         if (!email.toLowerCase().endsWith("@gmail.com")) {
-            new Alert(Alert.AlertType.ERROR, "Invalid Email! Please use a @gmail.com address.").show();
+            showAlert(Alert.AlertType.ERROR, "Invalid Email", "Please use a @gmail.com address.");
+            return;
+        }
+
+        String passwordRegex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=\\S+$).{8,}$";
+        if (!password.matches(passwordRegex)) {
+            showAlert(Alert.AlertType.ERROR, "Weak Password",
+                    "Password must be 8+ chars, include Uppercase, Lowercase, and a Symbol.");
             return;
         }
 
         if (!password.equals(confirmPassword)) {
-            new Alert(Alert.AlertType.ERROR, "Passwords do not match!").show();
+            showAlert(Alert.AlertType.ERROR, "Mismatch", "Passwords do not match!");
             return;
         }
 
         if (saveUser(firstName, lastName, email, password)) {
-            new Alert(Alert.AlertType.INFORMATION, "Registration Successful! Please Login.").show();
+            showAlert(Alert.AlertType.INFORMATION, "Success", "Registration Successful! Please Login.");
             backToLoginOnAction(event);
         }
     }
 
     private boolean saveUser(String fName, String lName, String email, String password) {
-
         String url = "jdbc:mysql://localhost:3306/user_management?useSSL=false&serverTimezone=UTC";
-        String user = "root";
-        String dbPassword = "TB20010415";
+        String dbUser = "root";
+        String dbPassword = "TB20010415"; // ඔයාගේ ඇත්තම password එක මෙතනට දාන්න
 
         String sql = "INSERT INTO users (first_name, last_name, email, password) VALUES (?, ?, ?, ?)";
 
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
 
-            Connection connection = DriverManager.getConnection(url, user, dbPassword);
-            PreparedStatement pstm = connection.prepareStatement(sql);
+            try (Connection connection = DriverManager.getConnection(url, dbUser, dbPassword);
+                 PreparedStatement pstm = connection.prepareStatement(sql)) {
 
-            pstm.setString(1, fName);
-            pstm.setString(2, lName);
-            pstm.setString(3, email);
-            pstm.setString(4, password);
+                pstm.setString(1, fName);
+                pstm.setString(2, lName);
+                pstm.setString(3, email);
+                pstm.setString(4, password);
 
-            return pstm.executeUpdate() > 0;
-
+                int affectedRows = pstm.executeUpdate();
+                return affectedRows > 0;
+            }
+        } catch (ClassNotFoundException e) {
+            showAlert(Alert.AlertType.ERROR, "Driver Error", "MySQL JDBC Driver not found!");
+            e.printStackTrace();
+            return false;
         } catch (SQLException e) {
-
             if (e.getMessage().contains("Duplicate")) {
-                new Alert(Alert.AlertType.ERROR, "This email is already registered!").show();
+                showAlert(Alert.AlertType.ERROR, "Duplicate User", "This email is already registered!");
             } else {
-                new Alert(Alert.AlertType.ERROR, "Database Error!").show();
+                showAlert(Alert.AlertType.ERROR, "DB Error", "Error connecting to database.");
                 e.printStackTrace();
             }
             return false;
-
-        } catch (ClassNotFoundException e) {
-            new Alert(Alert.AlertType.ERROR, "MySQL Driver not found!").show();
-            e.printStackTrace();
-            return false;
         }
+    }
+
+    private void showAlert(Alert.AlertType type, String title, String content) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.show();
     }
 
     @FXML
