@@ -42,7 +42,6 @@ public class WelcomeFormController implements Initializable {
             stage.setTitle("Login");
             stage.show();
 
-            // clear session
             loggedUserFirstName = null;
 
         } catch (IOException e) {

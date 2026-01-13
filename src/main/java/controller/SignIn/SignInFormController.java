@@ -11,6 +11,8 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -56,45 +58,53 @@ public class SignInFormController {
             return;
         }
 
-        if (saveUser(firstName, lastName, email, password)) {
+        String hashedPassword = hashPassword(password);
+
+        if (saveUser(firstName, lastName, email, hashedPassword)) {
             showAlert(Alert.AlertType.INFORMATION, "Success", "Registration Successful! Please Login.");
             backToLoginOnAction(event);
         }
     }
 
-    private boolean saveUser(String fName, String lName, String email, String password) {
+    private boolean saveUser(String fName, String lName, String email, String hashedPassword) {
         String url = "jdbc:mysql://localhost:3306/user_management?useSSL=false&serverTimezone=UTC";
         String dbUser = "root";
-        String dbPassword = "TB20010415"; // ඔයාගේ ඇත්තම password එක මෙතනට දාන්න
+        String dbPassword = "TB20010415";
 
         String sql = "INSERT INTO users (first_name, last_name, email, password) VALUES (?, ?, ?, ?)";
 
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-
             try (Connection connection = DriverManager.getConnection(url, dbUser, dbPassword);
                  PreparedStatement pstm = connection.prepareStatement(sql)) {
 
                 pstm.setString(1, fName);
                 pstm.setString(2, lName);
                 pstm.setString(3, email);
-                pstm.setString(4, password);
+                pstm.setString(4, hashedPassword);
 
-                int affectedRows = pstm.executeUpdate();
-                return affectedRows > 0;
+                return pstm.executeUpdate() > 0;
             }
-        } catch (ClassNotFoundException e) {
-            showAlert(Alert.AlertType.ERROR, "Driver Error", "MySQL JDBC Driver not found!");
+        } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "DB Error", "Failed to save user: " + e.getMessage());
             return false;
-        } catch (SQLException e) {
-            if (e.getMessage().contains("Duplicate")) {
-                showAlert(Alert.AlertType.ERROR, "Duplicate User", "This email is already registered!");
-            } else {
-                showAlert(Alert.AlertType.ERROR, "DB Error", "Error connecting to database.");
-                e.printStackTrace();
+        }
+    }
+
+    private String hashPassword(String password) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(password.getBytes(StandardCharsets.UTF_8));
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) hexString.append('0');
+                hexString.append(hex);
             }
-            return false;
+            return hexString.toString();
+        } catch (Exception ex) {
+            throw new RuntimeException("Error hashing password", ex);
         }
     }
 
@@ -110,11 +120,8 @@ public class SignInFormController {
     void backToLoginOnAction(ActionEvent event) {
         try {
             Stage stage = (Stage) btnBackToLogin.getScene().getWindow();
-            stage.setScene(new Scene(
-                    FXMLLoader.load(getClass().getResource("/view/LoginForm.fxml"))
-            ));
+            stage.setScene(new Scene(FXMLLoader.load(getClass().getResource("/view/LoginForm.fxml"))));
             stage.setTitle("Login");
-            stage.show();
         } catch (IOException e) {
             e.printStackTrace();
         }
