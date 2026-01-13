@@ -1,14 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="$CONTROLLER_NAME$"
-            prefHeight="400.0" prefWidth="600.0" >
+<AnchorPane prefHeight="450.0" prefWidth="700.0" style="-fx-background-color: #f0f2f5;" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.LoginFormController">
+    <children>
+        <AnchorPane prefHeight="450.0" prefWidth="300.0" style="-fx-background-color: #2563eb;">
+            <children>
+                <Label layoutX="64.0" layoutY="160.0" text="Welcome Back!" textFill="WHITE">
+                    <font>
+                        <Font name="System Bold" size="24.0" />
+                    </font>
+                </Label>
+                <Label layoutX="45.0" layoutY="205.0" text="To keep connected with us please" textFill="WHITE" />
+                <Label layoutX="68.0" layoutY="222.0" text="login with your personal info" textFill="WHITE" />
+            </children>
+        </AnchorPane>
 
+        <AnchorPane layoutX="300.0" prefHeight="450.0" prefWidth="400.0" style="-fx-background-color: #ffffff;">
+            <children>
+                <Label layoutX="146.0" layoutY="55.0" text="Sign In" textFill="#2563eb">
+                    <font>
+                        <Font name="System Bold" size="32.0" />
+                    </font>
+                </Label>
+
+                <TextField fx:id="txtEmail" layoutX="50.0" layoutY="150.0" prefHeight="40.0" prefWidth="300.0" promptText="Email" style="-fx-background-radius: 5; -fx-border-color: #d1d5db; -fx-border-radius: 5;" />
+
+                <PasswordField fx:id="txtPassword" layoutX="50.0" layoutY="210.0" prefHeight="40.0" prefWidth="300.0" promptText="Password" style="-fx-background-radius: 5; -fx-border-color: #d1d5db; -fx-border-radius: 5;" />
+
+                <Button fx:id="btnSignIn" layoutX="50.0" layoutY="280.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="300.0" style="-fx-background-color: #2563eb; -fx-cursor: hand;" text="SIGN IN" textFill="WHITE">
+                    <font>
+                        <Font name="System Bold" size="14.0" />
+                    </font>
+                </Button>
+
+                <Label layoutX="104.0" layoutY="350.0" text="Don't have an account?" textFill="#6b7280" />
+                <Hyperlink fx:id="btnSignUp" layoutX="243.0" layoutY="347.0" text="Sign Up" textFill="#2563eb" />
+            </children>
+        </AnchorPane>
+    </children>
 </AnchorPane>
